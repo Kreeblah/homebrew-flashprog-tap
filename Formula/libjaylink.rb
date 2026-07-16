@@ -32,7 +32,10 @@ class Libjaylink < Formula
 
       int main(void)
       {
-        printf("%d", jaylink_version_package_get_major());
+        printf("%d.%d.%d",
+               jaylink_version_package_get_major(),
+               jaylink_version_package_get_minor(),
+               jaylink_version_package_get_micro());
         return 0;
       }
     CSRC
