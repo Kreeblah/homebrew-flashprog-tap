@@ -26,6 +26,17 @@ class Libjaylink < Formula
   end
 
   test do
-    assert_equal "a", "a"
+    (testpath/"test.c").write <<~CSRC
+      #include <stdio.h>
+      #include "libjaylink/libjaylink.h"
+
+      int main(void)
+      {
+        printf("%d", jaylink_version_package_get_major());
+        return 0;
+      }
+    CSRC
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-o", "test"
+    system "./test"
   end
 end
