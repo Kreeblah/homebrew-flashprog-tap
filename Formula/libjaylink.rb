@@ -36,7 +36,7 @@ class Libjaylink < Formula
         return 0;
       }
     CSRC
-    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-o", "test"
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-ljaylink", "-o", "test"
     system "./test"
   end
 end
