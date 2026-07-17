@@ -31,7 +31,7 @@ class Flashprog < Formula
   test do
     system bin/"flashprog", "--version"
 
-    output = shell_output(bin/"flashprog --erase --programmer dummy 2>&1", 1)
+    output = shell_output("#{bin}/flashprog --erase --programmer dummy 2>&1", 1)
     assert_match "No EEPROM/flash device found", output
   end
 end
