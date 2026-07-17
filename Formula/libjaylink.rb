@@ -6,18 +6,16 @@ class Libjaylink < Formula
   license "GPL-2.0-or-later"
   head "https://gitlab.zapb.de/libjaylink/libjaylink.git", branch: "master"
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkgconf" => :build
 
   depends_on "libusb"
 
   def install
-    system "./autogen.sh"
-    system "./configure", *std_configure_args
-    system "make"
-    system "make", "install"
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
