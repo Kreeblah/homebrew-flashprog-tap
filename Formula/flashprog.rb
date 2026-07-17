@@ -6,35 +6,32 @@ class Flashprog < Formula
   license "GPL-2.0-or-later"
   head "https://github.com/SourceArcade/flashprog.git", branch: "main"
 
-  depends_on "gcc" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkgconf" => :build
 
   depends_on "libftdi"
   depends_on "libjaylink"
   depends_on "libusb"
 
-  on_linux do
-    depends_on "make" => :build
-  end
-
-  fails_with :clang do
-    cause "'make' fails with 'error: variable length array folded " \
-          "to constant array as an extension [-Werror,-Wgnu-folding-constant]'"
-  end
-
-  fails_with :llvm_clang do
-    cause "'make' fails with 'error: variable length array folded " \
-          "to constant array as an extension [-Werror,-Wgnu-folding-constant]'"
-  end
-
   def install
-    ENV["PREFIX"] = prefix.to_s
     ENV["CONFIG_ENABLE_LIBPCI_PROGRAMMERS"] = "no"
-    system "make"
-    system "make", "install"
+
+    # install DirectHW for osx x86 builds
+    if OS.mac? && Hardware::CPU.intel?
+      (buildpath/"DirectHW").install resource("DirectHW")
+      ENV.append "CFLAGS", "-I#{buildpath}"
+    end
+
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    assert_equal "a", "a"
+    system sbin/"flashprog", "--version"
+
+    output = shell_output("#{sbin}/flashprog --erase --programmer dummy 2>&1", 1)
+    assert_match "No EEPROM/flash device found", output
   end
 end
